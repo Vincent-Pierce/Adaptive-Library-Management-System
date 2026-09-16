@@ -1,26 +1,9 @@
-
 #pragma once
-/* **********************************************************************************************************
-* Author		: Vincent Pierce
-* Created		: September 11h 2026
-* Description	: Transaction Implementation
-*
-************************************************************************************************************/
 
-/* Standard Libs *******************************************************************************************/
-
-/* Class defs **********************************************************************************************/
-
-class Transaction
-{
+// Command Design pattern
+class Transaction {
 public:
-	// Default constructor for PriorityQueue
-
-
-
-
-private:
-
-
-
+	virtual void transaction() = 0;
+	virtual ~Transaction() = default;
 };
+

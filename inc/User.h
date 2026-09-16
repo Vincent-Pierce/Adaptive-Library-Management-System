@@ -1,25 +1,25 @@
-#pragma once
+#ifndef USER_H
+#define USER_H
 
 #include "Searchable.h"
 #include "Book.h"
 #include "Transaction.h"
-#include "String.h"
-
+#include  <string> 
 class User : public Searchable {
 
 public:
-	User(std::String _name, int _userId, float _balance, std::List<Book> _books)
-		: name(_name), userId(_userId), balance(_balance), books(_books) {}
+	User(std::string _name, int _userId, float _balance, std::vector<Book> _books)
+		: name(_name), userId(_userId), books(_books) {}
 
 	void search()					{}							//Todo
-	void addBook(Book b)			{ books.push_back(b); }
-	void removeBook(Book b)			{ std::erase(books, b); }
-	void transaction(Transaction t) { t->transaction }			// polymorhphism!
-	bool charge(void)				{ balance++; }
+	bool addBook(Book b)			{ books.push_back(b); return true; }
+	bool removeBook(Book b)			{ return true; }
+	void transaction(Transaction t) { t.transaction; }			// polymorhphism!
 
 private:
-	std::String		name;
-	int				userId;
-	float			balance;
-	std::List<Book>	books;
+	std::string		    name;
+	int				    userId;
+	std::vector<Book>	books;
 };
+
+#endif // !USER_H

@@ -17,20 +17,21 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-    PriorityQueue_test
-    tests/PriorityQueue_test.cpp
+    Library_test
+    tests/Library_test.cpp
 )
 
+
 target_include_directories(
-    PriorityQueue_test
-    PRIVATE include
+    Library_test
+    PRIVATE inc
 )
 
 target_link_libraries(
-    PriorityQueue_test
+    Library_test
     GTest::gtest_main
 )
 
 include(GoogleTest)
 
-gtest_discover_tests(PriorityQueue_test)
+gtest_discover_tests(Library_test)

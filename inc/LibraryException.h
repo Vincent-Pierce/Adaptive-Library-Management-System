@@ -1,8 +1,8 @@
-#pragma once
+#ifndef LIBRARYEXCEPTION_H
+#define LIBRARYEXCEPTION_H
 
 #include <exception>
-#include "String.h"
-
+#include  <string>
 class LibraryException : public std::exception {
 
 public:
@@ -15,3 +15,5 @@ private:
 	std::string message;
 
 };
+
+#endif // !LIBRARYEXCEPTION_H

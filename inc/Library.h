@@ -1,9 +1,11 @@
-#pragma once
+#ifndef LIBRARY_H
+#define LIBRARY_H
 
 #include "Book.h"
 #include "User.h"
 #include "Searchable.h"
-#include "String.h"
+#include  <string> 
+#include <vector>
 
 // A singleton design pattern. The entire system will only have a single Library instance
 class Library {
@@ -16,8 +18,8 @@ public:
 		return _instance;
 	}
 
-	bool search(Searchable& s)  { s.search(); } //Todo
-	bool addBook(Book& b)		{ return true; }
+	bool search(Searchable& s)  { s.search(); return true; } //Todo
+	bool addBook(Book& b)		{ available_books.push_back(b); return true; }
 	bool borrowBook(Book& s)	{ return true; }
 	bool returnBook(Book& s)	{ return true; }
 
@@ -27,10 +29,11 @@ protected:
 private:
 	static Library* _instance;
 
-	std::List<Book> available_books;
-	std::List<Book> borrowed_books;
-	std::List<User> users;
+	std::vector<Book> available_books;
+	std::vector<Book> borrowed_books;
+	std::vector<User> users;
 };
 
 Library* Library::_instance = 0;
 
+#endif // !LIBRARY_H

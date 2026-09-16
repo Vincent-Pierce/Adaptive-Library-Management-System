@@ -1,12 +1,16 @@
 @startuml
 
 class Library {
-    - available_books : List<Book>
-    - borrowed_books : List<Book>
-    - users : List<User>
- 
+    - available_books : vector<Book>
+    - borrowed_books : vector<Book>
+    - users : vector<User>
+    - _instance : Library*
+
+    + Instance()
     + addBook()
-    + register(s : Searchable)
+    + search(s : Searchable)
+    + borrowBook(s : Searchable)
+    + returnBook(s : Searchable)
 }
 
 interface Searchable {
@@ -15,9 +19,9 @@ interface Searchable {
 }
 
 class Book {
-    - title : String
-    - auhor : String
     - available : bool 
+    - author : String
+    - title : String
 
     + isAvailable()
     + search()
@@ -26,10 +30,13 @@ class Book {
 class User {
     - name : String
     - userId : int
-    - books : list<Book>
+    - books : vector<Book>
 
     + search()
+    + addBook(b : Book)
+    + removeBook(b : Book)
     + transaction(t : Transaction)
+    + charge()
 }
 
 /'
@@ -38,10 +45,9 @@ User invokes Transactions and Library received the command .
 '/
 
 class Client {
-    - library : Library
-    + borrowBook(user : User, book : Book)
-    + returnBook(user : User, book : Book)
-    + register(s : Searchable)
+    - lib : Library
+    + borrowBook(u : User, b : Book)
+    + returnBook(u : User, b : Book)
 }
 
 interface Transaction {
@@ -71,18 +77,32 @@ class ReturnTransaction {
     +transaction()
 }
 
+class LibraryException {
+    - message : String
+
+    + what()
+}
+
+class BookException {
+
+}
+
+class InputExcxeption {
+
+}
+
 class FileManager {
     - lib : Library
+
     + saveLibrary()
     + loadLibrary()
 }
 
 class LibraryException <<exception>>
 
-class BookUnavailableException <<exception>>
-class BookNotFoundException <<exception>>
-class UserNotFoundException <<exception>>
-class InvalidInputException <<exception>>
+class InputExcxeption <<exception>>
+class BookException <<exception>>
+
 
 Searchable <|.. Book
 Searchable <|.. User
@@ -98,8 +118,8 @@ Library --> Searchable
 User --> Book : borrows
 User --> Transaction : Invokes
 FileManager --> Library : Uses
-BookUnavailableException --|> LibraryException
-BookNotFoundException --|> LibraryException
-UserNotFoundException --|> LibraryException
-InvalidInputException --|> LibraryException
+BookException --|> LibraryException
+InputExcxeption --|> LibraryException
+
+
 @enduml

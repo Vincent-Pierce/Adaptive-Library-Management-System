@@ -6,7 +6,7 @@
 #include "Transaction.h"
 #include "Library.h"
 #include "BookException.h"
-#include "String.h"
+#include  <string> 
 
 class BorrowTransaction : public Transaction {
 public:
@@ -21,7 +21,7 @@ public:
 			lib.borrowBook(book);
 		}
 		else
-			throw BookException();
+			throw BookException("Book is not available for borrowing.\n");
 	}
 
 private:

@@ -1,10 +1,11 @@
-#pragma once
+#ifndef CLIENT_H
+#define CLIENT_H
 
 #include "Searchable.h"
-#include "Transaction.h"
-#include "Library"
-#include "String.h"
-
+#include "ReturnTransaction.h"
+#include "BorrowTransaction.h"
+#include "Library.h"
+#include  <string>
 class Client
 {
 public:
@@ -12,15 +13,17 @@ public:
 
 	bool borrowBook(Book& b, User& u)
 	{
-		BorrowTransaction bt = BorrowTransaction(u, b, lib);
+		BorrowTransaction bt = BorrowTransaction(lib, b, u);
 		bt.transaction();
 	}
 	bool returnBook(Book& b, User& u)
 	{
-		ReturnTransaction rt = ReturnTransaction(u, b, lib);
+		ReturnTransaction rt = ReturnTransaction(lib, b, u);
 		rt.transaction();
 	}
 
 private:
 	Library& lib;
 };
+
+#endif // !CLIENT_H

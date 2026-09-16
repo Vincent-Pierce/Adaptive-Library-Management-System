@@ -1,18 +1,19 @@
-#pragma once
+#ifndef BOOK_H
+#define BOOK_H
 
-#include "Searchable"
-#include "String.h"
-
+#include "Searchable.h"
+#include  <string> 
 class Book : Searchable {
 public:
-	Book(bool _available, std::String _author, std::String _title) : available(_available), author(_author), title(_title)  {};
+	Book(bool _available, std::string _author, std::string _title) : available(_available), author(_author), title(_title)  {};
 
 	bool isAvailable() { return this->available; }
 	void search()      {} //Todo
 
 private:
 	bool available;
-	std::String author;
-	std::String title;
+	std::string author;
+	std::string title;
 };
 
+#endif // !BOOK_H

@@ -1,5 +1,8 @@
 @startuml
 
+/` 
+Singleton 
+`/
 class Library {
     - available_books : vector<Book>
     - borrowed_books : vector<Book>

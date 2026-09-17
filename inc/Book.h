@@ -3,12 +3,12 @@
 
 #include "Searchable.h"
 #include  <string> 
-class Book : Searchable {
+class Book : public Searchable {
 public:
 	Book(bool _available, std::string _author, std::string _title) : available(_available), author(_author), title(_title)  {};
 
 	bool isAvailable() { return this->available; }
-	void search()      {} //Todo
+	bool search()      { return true; } //Todo
 
 private:
 	bool available;

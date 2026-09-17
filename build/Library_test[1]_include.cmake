@@ -1,5 +1,0 @@
-if(EXISTS "/home/vincent-pierce/Documents/Adaptive_Library_Management_System/build/Library_test[1]_tests.cmake")
-  include("/home/vincent-pierce/Documents/Adaptive_Library_Management_System/build/Library_test[1]_tests.cmake")
-else()
-  add_test(Library_test_NOT_BUILT Library_test_NOT_BUILT)
-endif()

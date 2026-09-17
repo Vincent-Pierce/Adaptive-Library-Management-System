@@ -11,10 +11,10 @@ public:
 	User(std::string _name, int _userId, float _balance, std::vector<Book> _books)
 		: name(_name), userId(_userId), books(_books) {}
 
-	void search()					{}							//Todo
+	bool search()					{ return true; }							//Todo
 	bool addBook(Book b)			{ books.push_back(b); return true; }
 	bool removeBook(Book b)			{ return true; }
-	void transaction(Transaction t) { t.transaction; }			// polymorhphism!
+	void transaction(Transaction *t) { t->transaction(); }			// polymorhphism!
 
 private:
 	std::string		    name;

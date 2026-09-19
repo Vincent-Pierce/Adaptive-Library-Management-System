@@ -13,8 +13,11 @@ public:
 		: user(_user), book(_book), lib(_lib) {}
 
 	void transaction() override {
-		if (user.removeBook(book))
-			lib.returnBook(book);
+		if (user.returnBook(book))
+		{
+			lib.removeUser(user);
+			book.setAvailable(true);
+		}
 		else
 			throw BookException("User does not have this book to return.\n");
 	}

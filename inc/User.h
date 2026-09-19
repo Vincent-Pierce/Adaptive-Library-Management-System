@@ -4,22 +4,55 @@
 #include "Searchable.h"
 #include "Book.h"
 #include "Transaction.h"
-#include  <string> 
+#include <string> 
+#include <vector>
+#include <algorithm>
 class User : public Searchable {
 
 public:
-	User(std::string _name, int _userId, float _balance, std::vector<Book> _books)
-		: name(_name), userId(_userId), books(_books) {}
+	User(std::string _name, int _userId, std::vector<std::string> _book_authors)
+		: name(_name), userId(_userId), book_authors(_book_authors) {}
 
-	bool search()					{ return true; }							//Todo
-	bool addBook(Book b)			{ books.push_back(b); return true; }
-	bool removeBook(Book b)			{ return true; }
+	bool search(const std::string& query) override
+	{ 
+		return query == this->name;
+	}
+	
+	bool searchAuthor(const std::string& query)  
+	{ 
+		for(std::string& author : book_authors)
+		{
+			if(author == query)
+				return true;
+		}
+		return false;
+	}
+
+	bool addBook(Book b)
+	{ 
+		book_authors.push_back(b.getAuthor()); 
+		return true; 
+	}
+
+	bool returnBook(Book b)
+	{ 
+		auto it = std::find(book_authors.begin(), book_authors.end(), b.getAuthor());
+		if (it == book_authors.end())
+			return false;
+		else
+		{
+			book_authors.erase(it);
+			return true; 
+		}
+	}
+
+	int getUserId() { return this->userId; }
 	void transaction(Transaction *t) { t->transaction(); }			// polymorhphism!
 
 private:
-	std::string		    name;
-	int				    userId;
-	std::vector<Book>	books;
+	std::string				    name;
+	int				    		userId;
+	std::vector<std::string>	book_authors; // list of authors of books borrowed by the user
 };
 
 #endif // !USER_H

@@ -2,7 +2,7 @@
 #define SEARCHABLE_H
 class Searchable {
 public:
-	virtual bool search() = 0;
+	virtual bool search(const std::string& query) = 0;
 	virtual ~Searchable() = default;
 };
 

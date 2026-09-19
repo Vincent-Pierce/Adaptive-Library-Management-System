@@ -14,12 +14,14 @@ public:
 	bool borrowBook(Book& b, User& u)
 	{
 		BorrowTransaction bt = BorrowTransaction(lib, b, u);
-		bt.transaction();
+		u.transaction(&bt);
+		return true;
 	}
 	bool returnBook(Book& b, User& u)
 	{
 		ReturnTransaction rt = ReturnTransaction(lib, b, u);
-		rt.transaction();
+		u.transaction(&rt);
+		return true;
 	}
 
 private:

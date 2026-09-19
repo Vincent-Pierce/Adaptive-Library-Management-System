@@ -17,7 +17,8 @@ public:
 		if (book.isAvailable())
 		{
 			user.addBook(book);
-			lib.borrowBook(book);
+			lib.borrowBook(user);
+			book.setAvailable(false);
 		}
 		else
 			throw BookException("Book is not available for borrowing.\n");

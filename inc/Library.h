@@ -18,19 +18,53 @@ public:
 		return _instance;
 	}
 
-	bool search(Searchable& s)  { s.search(); return true; } //Todo
-	bool addBook(Book& b)		{ available_books.push_back(b); return true; }
-	bool borrowBook(Book& s)	{ return true; }
-	bool returnBook(Book& s)	{ return true; }
+	bool searchUser(const std::string query)  
+	{ 
+		for(User& u : users)
+		{
+			if(u.search(query))
+				return true;
+		}
+		return false;
+	}
+
+	bool searchBook(const std::string query)  
+	{ 
+		for(Book& b : books)
+		{
+			if(b.search(query))
+				return true;
+		}
+		return false;
+	} 
+
+	void borrowBook(User& u)
+	{ 
+		users.push_back(u);
+	}
+
+	bool removeUser(User& _u)
+	{ 
+		for(auto it = users.begin(); it != users.end(); ++it)
+		{
+			if(it->getUserId() == _u.getUserId())
+			{
+				users.erase(it);
+				return true;
+			}
+		}
+		return false; 
+	}
+
+	bool addBook(Book& b)		{ books.push_back(b); return true; }
 
 protected:
-	Library() {}
+	Library() {};
 
 private:
 	static Library* _instance;
 
-	std::vector<Book> available_books;
-	std::vector<Book> borrowed_books;
+	std::vector<Book> books;
 	std::vector<User> users;
 };
 

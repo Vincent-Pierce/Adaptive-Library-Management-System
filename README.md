@@ -5,4 +5,5 @@ Use the shell scripts within the scripts folder to build and run unit tests. Goo
 
 
 
-<img width="812" height="1601" alt="image" src="https://github.com/user-attachments/assets/ab62f3c2-d044-4787-b4c9-03959a08f224" />
+
+<img width="834" height="1658" alt="image" src="https://github.com/user-attachments/assets/f15e61eb-4f33-4fc7-a8a9-b2ee58cd8a7c" />

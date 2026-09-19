@@ -118,7 +118,7 @@ Library "1" o-- "*" User
 Library --> Searchable
 User --> Book : borrows
 User --> Transaction : Invokes
-FileManager --> Library : Uses
+FileManager --> Library : save / load 
 BookException --|> LibraryException
 InputException --|> LibraryException
 Client ..|> InputException : <<Throws>>

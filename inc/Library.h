@@ -13,7 +13,7 @@ public:
 
 	static Library& Instance()
 	{
-		static Library instance; // Guaranteed to be destroyed. Instantiated on first use.
+		static Library instance; // Only constructed on first call 
 		return instance;
 	}
 
@@ -37,9 +37,10 @@ public:
 		return false;
 	} 
 
-	void borrowBook(User& u)
+	void addUser(User& u)
 	{ 
-		users.push_back(u);
+		if(!searchUser(u.getUserName()))
+			users.push_back(u);
 	}
 
 	bool removeUser(User& _u)
@@ -54,6 +55,8 @@ public:
 		}
 		return false; 
 	}
+
+	void clear() { users.clear(); books.clear(); } // For testing purposes only
 
 	bool addBook(Book& b)		{ books.push_back(b); return true; }
 	Library(const Library&) = delete; 			 // no copies of singleton

@@ -3,6 +3,14 @@
 #include "BorrowTransaction.h"
 #include "ReturnTransaction.h"
 
+class LibraryTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Clear the library before each test
+        Library::Instance().clear();
+    }
+};
+
 TEST(LibraryTest, SearchAddBook) {
     Library& lib = Library::Instance(); 
     Book book(false, "Author", "Title");
@@ -13,14 +21,14 @@ TEST(LibraryTest, SearchAddBook) {
 TEST(LibraryTest, SearchAddUser) {
     Library& lib = Library::Instance(); 
     User user("John", 1, {});
-    lib.borrowBook(user);
+    lib.addUser(user);
     EXPECT_EQ(lib.searchUser("John"), true);
 }
 
 TEST(LibraryTest, RemoveUser) {
     Library& lib = Library::Instance(); 
     User user("Jane", 2, {});
-    lib.borrowBook(user);
+    lib.addUser(user);
     EXPECT_EQ(lib.removeUser(user), true);
     EXPECT_EQ(lib.searchUser("Jane"), false);
 }
@@ -98,4 +106,50 @@ TEST(LibraryTest, ReturnBookNotBorrowed) {
     ReturnTransaction rt(lib, book, user);
     EXPECT_THROW(user.transaction(&rt), BookException);
     EXPECT_EQ(book.isAvailable(), true);
+}
+
+TEST(LibraryTest, LibrarySingleton) {
+    Library& lib1 = Library::Instance();
+    Library& lib2 = Library::Instance();
+    EXPECT_EQ(&lib1, &lib2); // Both references should point to the same instance
+}
+
+TEST(LibraryTest, UserBookCount) {
+    Library& lib = Library::Instance(); 
+    Book book(true, "Author6", "Title6");
+    User user("User6", 9, {});
+
+    lib.addBook(book);
+
+    BorrowTransaction bt(lib, book, user);
+    user.transaction(&bt);
+    EXPECT_EQ(user.getBookCount(), 1);
+
+    ReturnTransaction rt(lib, book, user);
+    user.transaction(&rt);
+    EXPECT_EQ(user.getBookCount(), 0);
+}
+
+TEST(LibraryTest, RemoveUserAfterReturningAllBooks) {
+    Library& lib = Library::Instance(); 
+    Book book1(true, "Author7", "Title7");
+    Book book2(true, "Author8", "Title8");
+    User user("User7", 10, {});
+
+    lib.addBook(book1);
+    lib.addBook(book2);
+
+    BorrowTransaction bt1(lib, book1, user);
+    BorrowTransaction bt2(lib, book2, user);
+    user.transaction(&bt1);
+    user.transaction(&bt2);
+    EXPECT_EQ(user.getBookCount(), 2);
+
+    ReturnTransaction rt1(lib, book1, user);
+    ReturnTransaction rt2(lib, book2, user);
+    user.transaction(&rt1);
+    user.transaction(&rt2);
+    
+    EXPECT_EQ(user.getBookCount(), 0);
+    EXPECT_EQ(lib.searchUser("User7"), false); 
 }

@@ -17,7 +17,7 @@ public:
 		if (book.isAvailable())
 		{
 			user.addBook(book);
-			lib.borrowBook(user);
+			lib.addUser(user);
 			book.setAvailable(false);
 		}
 		else

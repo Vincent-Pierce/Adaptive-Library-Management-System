@@ -15,8 +15,9 @@ public:
 	void transaction() override {
 		if (user.returnBook(book))
 		{
-			lib.removeUser(user);
 			book.setAvailable(true);
+			if(user.getBookCount() == 0)
+				lib.removeUser(user);
 		}
 		else
 			throw BookException("User does not have this book to return.\n");

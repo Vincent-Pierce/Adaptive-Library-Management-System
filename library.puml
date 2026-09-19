@@ -10,7 +10,7 @@ class Library {
     + searchBook(query : string)
     + borrowBook(b : Book)
     + addBook(b : Book)
-    + returnBook(b : Book)
+    + removeUser(u : User)
 }
 
 interface Searchable {
@@ -24,17 +24,21 @@ class Book {
     - title : String
 
     + isAvailable()
+    + setAvailabble()
     + search(query : string)
+    + getAuthor()
 }
 
 class User {
     - name : String
     - userId : int
-    - books : vector<String>
+    - book_authors : vector<String>
 
     + search(query : string)
+    + searchAuthor(query : string)
     + addBook(b : Book)
-    + removeBook(b : Book)
+    + returnBook(b : Book)
+    + getUserId()
     + transaction(t : Transaction)
 }
 

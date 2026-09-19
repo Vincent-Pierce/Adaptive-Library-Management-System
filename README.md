@@ -5,5 +5,5 @@ Use the shell scripts within the scripts folder to build and run unit tests. Goo
 
 
 
+![Library UML](library.png)
 
-<img width="834" height="1658" alt="image" src="https://github.com/user-attachments/assets/f15e61eb-4f33-4fc7-a8a9-b2ee58cd8a7c" />

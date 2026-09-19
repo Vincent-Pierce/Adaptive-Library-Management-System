@@ -46,13 +46,14 @@ public:
 		}
 	}
 
-	int getUserId() { return this->userId; }
-	void transaction(Transaction *t) { t->transaction(); }			// polymorhphism!
-	int getBookCount() { return book_authors.size(); }
-	std::string getUserName() { return this->name; }
+	void transaction(Transaction *t) 	{ t->transaction(); }			// polymorhphism!
+	int getBookCount() const 			{ return book_authors.size(); }
+	std::string getUserName() const 	{ return this->name; }
+	int getUserId() const 				{ return this->userId; }
 
 private:
 	std::string				    name;
+	int 						userId;
 	std::vector<std::string>	book_authors; // list of authors of books borrowed by the user
 };
 

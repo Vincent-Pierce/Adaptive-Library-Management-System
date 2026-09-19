@@ -57,6 +57,8 @@ public:
 	}
 
 	void clear() { users.clear(); books.clear(); } // For testing purposes only
+	const std::vector<Book>& getBooks() const { return books; } 
+	const std::vector<User>& getUsers() const { return users; } 
 
 	bool addBook(Book& b)		{ books.push_back(b); return true; }
 	Library(const Library&) = delete; 			 // no copies of singleton

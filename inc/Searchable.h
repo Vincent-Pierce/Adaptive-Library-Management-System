@@ -1,5 +1,7 @@
 #ifndef SEARCHABLE_H
 #define SEARCHABLE_H
+
+#include <string>
 class Searchable {
 public:
 	virtual bool search(const std::string& query) = 0;

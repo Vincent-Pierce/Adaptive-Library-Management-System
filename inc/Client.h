@@ -9,7 +9,7 @@
 class Client
 {
 public:
-	Client(Library _lib) : lib(_lib) {}
+	Client(Library& _lib) : lib(_lib) {}
 
 	bool borrowBook(Book& b, User& u)
 	{

@@ -11,11 +11,10 @@
 class Library {
 public:
 
-	static Library* Instance()
+	static Library& Instance()
 	{
-		if (_instance == 0)
-			_instance = new Library();
-		return _instance;
+		static Library instance; // Guaranteed to be destroyed. Instantiated on first use.
+		return instance;
 	}
 
 	bool searchUser(const std::string query)  
@@ -57,17 +56,15 @@ public:
 	}
 
 	bool addBook(Book& b)		{ books.push_back(b); return true; }
-
-protected:
-	Library() {};
+	Library(const Library&) = delete; 			 // no copies of singleton
+	Library& operator=(const Library&) = delete; // no assignment of singleton
 
 private:
-	static Library* _instance;
+	Library() = default; // Private constructor for singleton
 
 	std::vector<Book> books;
 	std::vector<User> users;
 };
 
-Library* Library::_instance = 0;
 
 #endif // !LIBRARY_H

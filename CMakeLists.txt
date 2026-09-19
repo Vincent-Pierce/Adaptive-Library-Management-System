@@ -32,6 +32,19 @@ target_link_libraries(
     GTest::gtest_main
 )
 
+target_compile_options( 
+    Library_test
+    PRIVATE
+    -coverage 
+    -O0
+    -g
+)
+target_link_options(
+    Library_test
+    PRIVATE
+    -coverage
+)
+
 include(GoogleTest)
 
 gtest_discover_tests(Library_test)

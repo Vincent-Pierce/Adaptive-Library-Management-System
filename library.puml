@@ -1,16 +1,19 @@
 @startuml
 
 class Library {
-    - _instance : Library*
     - books : vector<Book>
     - users : vector<User>
 
     + Instance()
     + searchUser(query : string)
     + searchBook(query : string)
-    + borrowBook(b : Book)
-    + addBook(b : Book)
+    + addUser(u : user)
     + removeUser(u : User)
+    + clear()
+    + getBooks()
+    + getUsers()
+    + addBook()
+    - Library()
 }
 
 interface Searchable {
@@ -27,6 +30,7 @@ class Book {
     + setAvailabble()
     + search(query : string)
     + getAuthor()
+    + getTitle()
 }
 
 class User {
@@ -38,6 +42,8 @@ class User {
     + searchAuthor(query : string)
     + addBook(b : Book)
     + returnBook(b : Book)
+    + getBookCount()
+    + getUserName()
     + getUserId()
     + transaction(t : Transaction)
 }

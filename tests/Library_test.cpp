@@ -2,6 +2,7 @@
 #include "Library.h"
 #include "BorrowTransaction.h"
 #include "ReturnTransaction.h"
+#include "FileManager.h"
 
 class LibraryTest : public ::testing::Test {
 protected:
@@ -152,4 +153,28 @@ TEST(LibraryTest, RemoveUserAfterReturningAllBooks) {
     
     EXPECT_EQ(user.getBookCount(), 0);
     EXPECT_EQ(lib.searchUser("User7"), false); 
+}
+
+TEST(LibraryTest, FileManagerSaveLoad) {
+    Library& lib = Library::Instance(); 
+    Book book1(true, "Author9", "Title9");
+    Book book2(false, "Author10", "Title10");
+    User user1("User8", 11, {});
+    User user2("User9", 12, {});
+
+    lib.addBook(book1);
+    lib.addBook(book2);
+    lib.addUser(user1);
+    lib.addUser(user2);
+
+    FileManager::saveLibrary();
+    
+    // Clear the library and load from file
+    lib.clear();
+    FileManager::loadLibrary();
+
+    EXPECT_EQ(lib.searchBook("Author9"), true);
+    EXPECT_EQ(lib.searchBook("Author10"), true);
+    EXPECT_EQ(lib.searchUser("User8"), true);
+    EXPECT_EQ(lib.searchUser("User9"), true);
 }

@@ -46,10 +46,10 @@ public:
 		}
 	}
 
-	void transaction(Transaction *t) 	{ t->transaction(); }			// polymorhphism!
 	int getBookCount() const 			{ return book_authors.size(); }
 	std::string getUserName() const 	{ return this->name; }
 	int getUserId() const 				{ return this->userId; }
+	void transaction(Transaction *t) 	{ t->transaction(); }			// polymorhphism!
 
 private:
 	std::string				    name;

@@ -1,13 +1,14 @@
 #include "LibraryException.h"
 #include "Library.h"
 #include "Transaction.h"
-#include "client.h"
+#include "Client.h"
+#include <iostream>
 
 int main() {
 	Library& lib = Library::Instance(); // get or init singleton
 	Client c	 = Client(lib);
 	Book   b	 = Book(false, "George Orwell", "Nineteen Eighty-Four");
-	User   u	 = User("VP", 132610241, 0.0, {});
+	User   u	 = User("VP", 132610241, {});
 	try {
 		c.borrowBook(b, u);
 	}

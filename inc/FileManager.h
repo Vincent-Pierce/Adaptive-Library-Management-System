@@ -10,7 +10,7 @@
 
 class FileManager {
 public:
-    static void saveLibraryToFile()
+    static void saveLibrary()
     {
         Library& lib = Library::Instance(); // Access the singleton Library instance
         std::filesystem::create_directories("log");
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    static void loadLibraryFromFile()
+    static void loadLibrary()
     {
         Library& lib = Library::Instance(); // Access the singleton Library instance
         lib.clear(); // Clear existing data before loading

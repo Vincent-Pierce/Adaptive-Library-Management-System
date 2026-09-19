@@ -13,7 +13,7 @@ public:
 
 	static Library& Instance()
 	{
-		static Library instance; // Only constructed on first call 
+		static Library instance; // Only constructed on first call, basically invokes Library() constructor
 		return instance;
 	}
 

@@ -3,7 +3,7 @@
 
 #include "LibraryException.h"
 #include  <string>
-class BookException : LibraryException {
+class BookException : public LibraryException {
 public:
 	BookException(std::string _msg) : LibraryException(_msg) {}
 };

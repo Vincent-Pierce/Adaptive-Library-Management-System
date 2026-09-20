@@ -6,10 +6,14 @@
 #include "BorrowTransaction.h"
 #include "Library.h"
 #include  <string>
+
+// Client class participating in command design pattern. Initializes the transaction type and 
+// invokes user transaction abstraction
 class Client
 {
 public:
 	Client(Library& _lib) : lib(_lib) {}
+
 
 	bool borrowBook(Book& b, User& u)
 	{

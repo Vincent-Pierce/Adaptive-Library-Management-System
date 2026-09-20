@@ -28,13 +28,15 @@ public:
 		return false;
 	}
 
-	bool addBook(Book b)
+	bool addBook(Book& b)
 	{ 
 		book_authors.push_back(b.getAuthor()); 
+		b.borrow(); // Mark the book as borrowed
 		return true; 
 	}
 
-	bool returnBook(Book b)
+	// Remove book from user list and mark book as avaiilable in the library
+	bool returnBook(Book& b)
 	{ 
 		auto it = std::find(book_authors.begin(), book_authors.end(), b.getAuthor());
 		if (it == book_authors.end())
@@ -42,14 +44,15 @@ public:
 		else
 		{
 			book_authors.erase(it);
+			b.returnBook(); // Mark the book as returned
 			return true; 
 		}
 	}
 
-	int getBookCount() const 			{ return book_authors.size(); }
+	int getBookCount() const 			{ return book_authors.size(); } // Return the number of books borrowed by the user
 	std::string getUserName() const 	{ return this->name; }
 	int getUserId() const 				{ return this->userId; }
-	void transaction(Transaction *t) 	{ t->transaction(); }			// polymorhphism!
+	void transaction(Transaction *t) 	{ t->transaction(); }			// command design pattern polymorhphism!
 
 private:
 	std::string				    name;

@@ -77,6 +77,12 @@ TEST(LibraryTest, BorrowUnavailableBook) {
     EXPECT_THROW(user.transaction(&bt), BookException);
 }
 
+TEST(LibraryTest, InputExceptionOnEmptySearch) {
+    Library& lib = Library::Instance(); 
+    EXPECT_THROW(lib.searchBook(""), InputException);
+    EXPECT_THROW(lib.searchUser(""), InputException);
+}
+
 TEST(LibraryTest, ReturnBook) {
     Library& lib = Library::Instance(); 
     Book book(true, "Author4", "Title4");

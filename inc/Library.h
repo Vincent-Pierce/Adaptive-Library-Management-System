@@ -6,6 +6,7 @@
 #include "Searchable.h"
 #include  <string> 
 #include <vector>
+#include <InputException.h>
 
 // A singleton design pattern. The entire system will only have a single Library instance
 class Library {
@@ -17,8 +18,11 @@ public:
 		return instance;
 	}
 
+	// search for user by name
 	bool searchUser(const std::string query)  
 	{ 
+		if(query.empty())
+			throw InputException("Search query cannot be empty.");
 		for(User& u : users)
 		{
 			if(u.search(query))
@@ -27,8 +31,11 @@ public:
 		return false;
 	}
 
+	// search for book by author or title
 	bool searchBook(const std::string query)  
 	{ 
+		if(query.empty())
+			throw InputException("Search query cannot be empty.");
 		for(Book& b : books)
 		{
 			if(b.search(query))
@@ -43,6 +50,7 @@ public:
 			users.push_back(u);
 	}
 
+	// delete user from user list
 	bool removeUser(User& _u)
 	{ 
 		for(auto it = users.begin(); it != users.end(); ++it)
@@ -56,7 +64,7 @@ public:
 		return false; 
 	}
 
-	void clear() { users.clear(); books.clear(); } // For testing purposes only
+	void clear() { users.clear(); books.clear(); } 
 	const std::vector<Book>& getBooks() const { return books; } 
 	const std::vector<User>& getUsers() const { return users; } 
 

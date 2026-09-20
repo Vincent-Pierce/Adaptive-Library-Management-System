@@ -14,7 +14,7 @@ public:
     {
         Library& lib = Library::Instance(); // Access the singleton Library instance
         std::filesystem::create_directories("log");
-        std::filesystem::path filepath = "log/log.txt";
+        std::filesystem::path filepath = "log/log.txt";  // created at /build/log.log.txt 
         std::ofstream file(filepath);
         for(const Book& b : lib.getBooks())
         {

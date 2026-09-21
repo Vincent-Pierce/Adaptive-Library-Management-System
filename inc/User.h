@@ -49,6 +49,7 @@ public:
 		}
 	}
 
+	std::vector<std::string> getBookAuthors() const { return this->book_authors; }
 	int getBookCount() const 			{ return book_authors.size(); } // Return the number of books borrowed by the user
 	std::string getUserName() const 	{ return this->name; }
 	int getUserId() const 				{ return this->userId; }

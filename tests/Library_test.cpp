@@ -3,6 +3,7 @@
 #include "BorrowTransaction.h"
 #include "ReturnTransaction.h"
 #include "FileManager.h"
+#include "Client.h"
 
 class LibraryTest : public ::testing::Test {
 protected:
@@ -163,15 +164,13 @@ TEST(LibraryTest, RemoveUserAfterReturningAllBooks) {
 
 TEST(LibraryTest, FileManagerSaveLoad) {
     Library& lib = Library::Instance(); 
-    Book book1(true, "Author9", "Title9");
-    Book book2(false, "Author10", "Title10");
-    User user1("User8", 11, {});
-    User user2("User9", 12, {});
+    Client client(lib);
 
-    lib.addBook(book1);
-    lib.addBook(book2);
-    lib.addUser(user1);
-    lib.addUser(user2);
+    lib.addBook(Book(true, "Author9", "Title9"));
+    lib.addBook(Book(false, "Author10", "Title10"));
+    lib.addUser(User("User8", 11, {}));
+    lib.addUser(User("User9", 12, {}));
+    client.borrowBook(lib.getBook("Title9"), lib.getUser("User8"));
 
     FileManager::saveLibrary();
     
@@ -183,4 +182,51 @@ TEST(LibraryTest, FileManagerSaveLoad) {
     EXPECT_EQ(lib.searchBook("Author10"), true);
     EXPECT_EQ(lib.searchUser("User8"), true);
     EXPECT_EQ(lib.searchUser("User9"), true);
+}
+
+TEST(LibraryTest, ClientBorrowReturn)
+{
+    Library& lib = Library::Instance(); 
+    Client client(lib);
+    Book book(true, "Author11", "Title11");
+    User user("User10", 13, {});
+
+    lib.addBook(book);
+
+    // Borrow the book using the client
+    client.borrowBook(book, user);
+    EXPECT_EQ(user.searchAuthor("Author11"), true);
+    EXPECT_EQ(book.isAvailable(), false);
+
+    // Return the book using the client
+    client.returnBook(book, user);
+    EXPECT_EQ(user.searchAuthor("Author11"), false);
+    EXPECT_EQ(book.isAvailable(), true);
+}
+
+TEST(LibraryTest, ReturnBookSameAuthor)
+{
+    Library& lib = Library::Instance(); 
+    Book book1(true, "Author12", "Title12");
+    Book book2(true, "Author12", "Title13");
+    User user("User11", 14, {});
+
+    lib.addBook(book1);
+    lib.addBook(book2);
+
+    BorrowTransaction bt1(lib, book1, user);
+    BorrowTransaction bt2(lib, book2, user);
+    user.transaction(&bt1);
+    user.transaction(&bt2);
+    EXPECT_EQ(user.getBookCount(), 2);
+
+    ReturnTransaction rt1(lib, book1, user);
+    user.transaction(&rt1);
+    EXPECT_EQ(user.getBookCount(), 1);
+    EXPECT_EQ(lib.searchUser("User11"), true);
+
+    ReturnTransaction rt2(lib, book2, user);
+    user.transaction(&rt2);
+    EXPECT_EQ(user.getBookCount(), 0);
+    EXPECT_EQ(lib.searchUser("User11"), false);
 }

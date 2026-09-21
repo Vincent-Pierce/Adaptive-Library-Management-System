@@ -23,7 +23,12 @@ public:
 
         for(const User& u : lib.getUsers())
         {
-            file << "User: " << u.getUserName() << ", ID: " << u.getUserId() << std::endl;
+            file << "User: " << u.getUserName() << ", ID: " << u.getUserId() << ", Book_Authors: ";
+            for(const std::string& author : u.getBookAuthors())
+            {
+                file << author << ", ";
+            }
+            file << std::endl;
         }
     }
 
@@ -66,7 +71,28 @@ public:
                 size_t idStart = nameEnd + 6;
                 int userId = std::stoi(line.substr(idStart));
 
-                User user(name, userId, {});
+                std::vector<std::string> book_authors;
+                size_t authorsStart = line.find(", Book_Authors: ") + 16;
+                if (authorsStart != std::string::npos)
+                {
+                    size_t authorsEnd = line.find_last_of(",");
+                    if (authorsEnd != std::string::npos)
+                    {
+                        std::string authorsStr = line.substr(authorsStart, authorsEnd - authorsStart);
+                        // Split the authors string by ", " and add each author to the vector
+                        size_t pos = 0;
+                        size_t commaPos = authorsStr.find(", ");
+                        while (commaPos != std::string::npos)
+                        {
+                            book_authors.push_back(authorsStr.substr(pos, commaPos - pos));
+                            pos = commaPos + 2;
+                            commaPos = authorsStr.find(", ", pos);
+                        }
+                        book_authors.push_back(authorsStr.substr(pos)); // Add the last author
+                    }
+                }
+
+                User user(name, userId, book_authors);
                 lib.addUser(user);
             }
         }

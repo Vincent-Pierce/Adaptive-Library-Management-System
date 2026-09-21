@@ -44,7 +44,27 @@ public:
 		return false;
 	} 
 
-	void addUser(User& u)
+	Book& getBook(const std::string query)  
+	{ 
+		for(Book& b : books)
+		{
+			if(b.search(query))
+				return b;
+		}
+		throw InputException("Book not found.");
+	}
+
+	User& getUser(const std::string query)  
+	{ 
+		for(User& u : users)
+		{
+			if(u.search(query))
+				return u;
+		}
+		throw InputException("User not found.");
+	}
+
+	void addUser(const User& u)
 	{ 
 		if(!searchUser(u.getUserName()))
 			users.push_back(u);
@@ -68,7 +88,7 @@ public:
 	const std::vector<Book>& getBooks() const { return books; } 
 	const std::vector<User>& getUsers() const { return users; } 
 
-	bool addBook(Book& b)		{ books.push_back(b); return true; }
+	bool addBook(const Book& b)		{ books.push_back(b); return true; }
 	Library(const Library&) = delete; 			 // no copies of singleton
 	Library& operator=(const Library&) = delete; // no assignment of singleton
 

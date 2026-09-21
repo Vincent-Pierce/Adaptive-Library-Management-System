@@ -7,6 +7,8 @@ class Library {
     + Instance()
     + searchUser(query : string)
     + searchBook(query : string)
+    + getBook(query : string)
+    + getUser(query : string)
     + addUser(u : user)
     + removeUser(u : User)
     + clear()
@@ -26,9 +28,10 @@ class Book {
     - author : String
     - title : String
 
-    + isAvailable()
-    + setAvailabble()
+    + borrow()
+    + returnBook()
     + search(query : string)
+    + isAvailable()
     + getAuthor()
     + getTitle()
 }
@@ -42,6 +45,7 @@ class User {
     + searchAuthor(query : string)
     + addBook(b : Book)
     + returnBook(b : Book)
+    + getBookAuthors()
     + getBookCount()
     + getUserName()
     + getUserId()
@@ -101,8 +105,6 @@ class InputException {
 }
 
 class FileManager {
-    - lib : Library&
-
     + saveLibrary()
     + loadLibrary()
 }
@@ -130,5 +132,5 @@ InputException --|> LibraryException
 Client ..|> InputException : <<Throws>>
 ReturnTransaction ..|> BookException : <<Throws>>
 BorrowTransaction ..|> BookException : <<Throws>>
-
+Library ..|> InputException : <<Throws>>
 @enduml

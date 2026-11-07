@@ -14,8 +14,11 @@ public:
 
 	// Implementation of transaction for returning book.
 	void transaction() override {
-		if (user.returnBook(book))
+		const std::shared_ptr<Book> managedBook = lib.getBookPointer(book);
+		if (user.returnBook(managedBook))
 		{
+			if (managedBook.get() != &book)
+				book.returnBook();
 			if(user.getBookCount() == 0)
 				lib.removeUser(user);
 		}

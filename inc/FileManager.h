@@ -16,9 +16,9 @@ public:
         std::filesystem::create_directories("log");
         std::filesystem::path filepath = "log/log.txt";  // created at /build/log.log.txt 
         std::ofstream file(filepath);
-        for(const Book& b : lib.getBooks())
+        for(const std::shared_ptr<Book>& book : lib.getBooks())
         {
-            file << "Book: " << b.getAuthor() << ", " << b.getTitle() << ", Available: " << (b.isAvailable() ? "Yes" : "No") << std::endl;
+            file << "Book: " << book->getAuthor() << ", " << book->getTitle() << ", Available: " << (book->isAvailable() ? "Yes" : "No") << std::endl;
         }        
 
         for(const User& u : lib.getUsers())
@@ -92,7 +92,18 @@ public:
                     }
                 }
 
-                User user(name, userId, book_authors);
+                User user(name, userId);
+                for (const std::string& author : book_authors)
+                {
+                    try
+                    {
+                        user.trackBorrowedBook(lib.getBookPointer(lib.getBook(author)));
+                    }
+                    catch (const InputException&)
+                    {
+                        std::cerr << "Borrowed book not found while loading user: " << author << std::endl;
+                    }
+                }
                 lib.addUser(user);
             }
         }

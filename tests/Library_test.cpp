@@ -20,6 +20,19 @@ TEST(LibraryTest, SearchAddBook) {
     EXPECT_EQ(lib.searchBook("Author"), true);
 }
 
+TEST(LibraryTest, AddingDuplicateBooksIsRejected) {
+    Library& lib = Library::Instance();
+    const Book duplicate(true, "DuplicateAuthor", "DuplicateTitle");
+
+    ASSERT_TRUE(lib.addBook(duplicate));
+    EXPECT_FALSE(lib.addBook(duplicate));
+
+    const auto& books = lib.getBooks();
+    ASSERT_EQ(books.size(), 1);
+    EXPECT_EQ(books[0]->getAuthor(), "DuplicateAuthor");
+    EXPECT_EQ(books[0]->getTitle(), "DuplicateTitle");
+}
+
 TEST(LibraryTest, SearchAddUser) {
     Library& lib = Library::Instance(); 
     User user("John", 1, {});
@@ -120,6 +133,24 @@ TEST(LibraryTest, LibrarySingleton) {
     Library& lib1 = Library::Instance();
     Library& lib2 = Library::Instance();
     EXPECT_EQ(&lib1, &lib2); // Both references should point to the same instance
+}
+
+TEST(LibraryTest, LibraryOwnsBooksAndUserReferencesThemWeakly) {
+    Library& lib = Library::Instance();
+    lib.addBook(Book(true, "OwnedAuthor", "OwnedTitle"));
+    User user("Borrower", 15, {});
+    lib.addUser(user);
+
+    Book& book = lib.getBook("OwnedTitle");
+    BorrowTransaction transaction(lib, book, lib.getUser("Borrower"));
+    transaction.transaction();
+
+    std::weak_ptr<Book> weakBook = lib.getBookPointer(book);
+    EXPECT_EQ(lib.getUser("Borrower").getBookCount(), 1);
+    EXPECT_FALSE(weakBook.expired());
+
+    lib.clear();
+    EXPECT_TRUE(weakBook.expired());
 }
 
 TEST(LibraryTest, UserBookCount) {

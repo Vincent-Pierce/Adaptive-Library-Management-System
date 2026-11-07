@@ -5,6 +5,7 @@
 #include "User.h"
 #include "Searchable.h"
 #include  <string> 
+#include <memory>
 #include <vector>
 #include <InputException.h>
 
@@ -36,9 +37,9 @@ public:
 	{ 
 		if(query.empty())
 			throw InputException("Search query cannot be empty.");
-		for(Book& b : books)
+		for(const std::shared_ptr<Book>& b : books)
 		{
-			if(b.search(query))
+			if(b->search(query))
 				return true;
 		}
 		return false;
@@ -46,10 +47,22 @@ public:
 
 	Book& getBook(const std::string query)  
 	{ 
-		for(Book& b : books)
+		for(const std::shared_ptr<Book>& b : books)
 		{
-			if(b.search(query))
-				return b;
+			if(b->search(query))
+				return *b;
+		}
+		throw InputException("Book not found.");
+	}
+
+	std::shared_ptr<Book> getBookPointer(const Book& book) const
+	{
+		for(const std::shared_ptr<Book>& storedBook : books)
+		{
+			if(storedBook.get() == &book ||
+				(storedBook->getAuthor() == book.getAuthor() &&
+				 storedBook->getTitle() == book.getTitle()))
+				return storedBook;
 		}
 		throw InputException("Book not found.");
 	}
@@ -85,17 +98,27 @@ public:
 	}
 
 	void clear() { users.clear(); books.clear(); } 
-	const std::vector<Book>& getBooks() const { return books; } 
+	const std::vector<std::shared_ptr<Book>>& getBooks() const { return books; }
 	const std::vector<User>& getUsers() const { return users; } 
 
-	bool addBook(const Book& b)		{ books.push_back(b); return true; }
+	bool addBook(const Book& b)
+	{
+		for (const std::shared_ptr<Book>& book : books) // Do not allow duplicated books
+		{
+			if (book->getAuthor() == b.getAuthor() &&
+				book->getTitle() == b.getTitle())
+				return false;
+		}
+		books.push_back(std::make_shared<Book>(b));
+		return true;
+	}
 	Library(const Library&) = delete; 			 // no copies of singleton
 	Library& operator=(const Library&) = delete; // no assignment of singleton
 
 private:
 	Library() = default; // Private constructor for singleton
 
-	std::vector<Book> books;
+	std::vector<std::shared_ptr<Book>> books;
 	std::vector<User> users;
 };
 

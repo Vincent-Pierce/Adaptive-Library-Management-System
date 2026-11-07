@@ -6,12 +6,14 @@
 #include "Transaction.h"
 #include <string> 
 #include <vector>
+#include <memory>
 #include <algorithm>
+#include <utility>
 class User : public Searchable {
 
 public:
-	User(std::string _name, int _userId, std::vector<std::string> _book_authors)
-		: name(_name), userId(_userId), book_authors(_book_authors) {}
+	User(std::string _name, int _userId, std::vector<std::weak_ptr<Book>> _borrowedBooks = {})
+		: name(_name), userId(_userId), borrowedBooks(std::move(_borrowedBooks)) {}
 
 	bool search(const std::string& query) override
 	{ 
@@ -20,37 +22,67 @@ public:
 	
 	bool searchAuthor(const std::string& query)  
 	{ 
-		for(std::string& author : book_authors)
+		for(const std::weak_ptr<Book>& weakBook : borrowedBooks)
 		{
-			if(author == query)
+			const std::shared_ptr<Book> book = weakBook.lock();
+			if(book && book->getAuthor() == query)
 				return true;
 		}
 		return false;
 	}
 
-	bool addBook(Book& b)
+	bool addBook(const std::shared_ptr<Book>& book)
 	{ 
-		book_authors.push_back(b.getAuthor()); 
-		b.borrow(); // Mark the book as borrowed
+		if (!book)
+			return false;
+		book->borrow(); // Mark the book as borrowed
+		borrowedBooks.push_back(book);
 		return true; 
 	}
 
-	// Remove book from user list and mark book as avaiilable in the library
-	bool returnBook(Book& b)
-	{ 
-		auto it = std::find(book_authors.begin(), book_authors.end(), b.getAuthor());
-		if (it == book_authors.end())
-			return false;
-		else
-		{
-			book_authors.erase(it);
-			b.returnBook(); // Mark the book as returned
-			return true; 
-		}
+	void trackBorrowedBook(const std::shared_ptr<Book>& book)
+	{
+		if (book)
+			borrowedBooks.push_back(book);
 	}
 
-	std::vector<std::string> getBookAuthors() const { return this->book_authors; }
-	int getBookCount() const 			{ return book_authors.size(); } // Return the number of books borrowed by the user
+	// Remove book from user list and mark book as avaiilable in the library
+	bool returnBook(const std::shared_ptr<Book>& book)
+	{ 
+		for (auto it = borrowedBooks.begin(); it != borrowedBooks.end();)
+		{
+			const std::shared_ptr<Book> borrowedBook = it->lock();
+			if (!borrowedBook)
+			{
+				it = borrowedBooks.erase(it);
+				continue;
+			}
+			if (borrowedBook == book)
+			{
+				borrowedBooks.erase(it);
+				book->returnBook(); // Mark the book as returned
+				return true;
+			}
+			++it;
+		}
+		return false;
+	}
+
+	std::vector<std::string> getBookAuthors() const
+	{
+		std::vector<std::string> authors;
+		for (const std::weak_ptr<Book>& weakBook : borrowedBooks)
+		{
+			if (const std::shared_ptr<Book> book = weakBook.lock())
+				authors.push_back(book->getAuthor());
+		}
+		return authors;
+	}
+	int getBookCount() const
+	{
+		return std::count_if(borrowedBooks.begin(), borrowedBooks.end(),
+			[](const std::weak_ptr<Book>& book) { return !book.expired(); });
+	} // Return the number of books borrowed by the user
 	std::string getUserName() const 	{ return this->name; }
 	int getUserId() const 				{ return this->userId; }
 	void transaction(Transaction *t) 	{ t->transaction(); }			// command design pattern polymorhphism!
@@ -58,7 +90,7 @@ public:
 private:
 	std::string				    name;
 	int 						userId;
-	std::vector<std::string>	book_authors; // list of authors of books borrowed by the user
+	std::vector<std::weak_ptr<Book>> borrowedBooks;
 };
 
 #endif // !USER_H

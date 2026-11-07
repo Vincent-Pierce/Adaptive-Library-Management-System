@@ -16,9 +16,12 @@ public:
 
 	// Implementation of transaction for borrowing book. 
 	void transaction() override {
-		if (book.isAvailable())
+		const std::shared_ptr<Book> managedBook = lib.getBookPointer(book);
+		if (managedBook->isAvailable())
 		{
-			user.addBook(book);
+			user.addBook(managedBook);
+			if (managedBook.get() != &book)
+				book.borrow();
 			lib.addUser(user);
 		}
 		else

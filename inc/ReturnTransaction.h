@@ -17,8 +17,7 @@ public:
 		const std::shared_ptr<Book> managedBook = lib.getBookPointer(book);
 		if (user.returnBook(managedBook))
 		{
-			if (managedBook.get() != &book)
-				book.returnBook();
+			managedBook->returnBook();
 			if(user.getBookCount() == 0)
 				lib.removeUser(user);
 		}

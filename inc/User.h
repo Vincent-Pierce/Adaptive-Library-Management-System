@@ -35,7 +35,6 @@ public:
 	{ 
 		if (!book)
 			return false;
-		book->borrow(); // Mark the book as borrowed
 		borrowedBooks.push_back(book);
 		return true; 
 	}
@@ -46,7 +45,7 @@ public:
 			borrowedBooks.push_back(book);
 	}
 
-	// Remove book from user list and mark book as avaiilable in the library
+	// Remove book from user list
 	bool returnBook(const std::shared_ptr<Book>& book)
 	{ 
 		for (auto it = borrowedBooks.begin(); it != borrowedBooks.end();)
@@ -60,7 +59,6 @@ public:
 			if (borrowedBook == book)
 			{
 				borrowedBooks.erase(it);
-				book->returnBook(); // Mark the book as returned
 				return true;
 			}
 			++it;

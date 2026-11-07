@@ -108,13 +108,13 @@ TEST(LibraryTest, ReturnBook) {
     user.transaction(&bt);
     EXPECT_EQ(user.searchAuthor("Author4"), true);
     EXPECT_EQ(lib.searchUser("User4"), true);
-    EXPECT_EQ(book.isAvailable(), false);
+    EXPECT_EQ(lib.getBook("Title4").isAvailable(), false);
 
     ReturnTransaction rt(lib, book, user);
     user.transaction(&rt);
     EXPECT_EQ(user.searchAuthor("Author4"), false);
     EXPECT_EQ(lib.searchUser("User4"), false);
-    EXPECT_EQ(book.isAvailable(), true);
+    EXPECT_EQ(lib.getBook("Title4").isAvailable(), true);
 }
 
 TEST(LibraryTest, ReturnBookNotBorrowed) {
@@ -126,7 +126,7 @@ TEST(LibraryTest, ReturnBookNotBorrowed) {
 
     ReturnTransaction rt(lib, book, user);
     EXPECT_THROW(user.transaction(&rt), BookException);
-    EXPECT_EQ(book.isAvailable(), true);
+    EXPECT_EQ(lib.getBook("Title5").isAvailable(), true);
 }
 
 TEST(LibraryTest, LibrarySingleton) {
@@ -227,12 +227,12 @@ TEST(LibraryTest, ClientBorrowReturn)
     // Borrow the book using the client
     client.borrowBook(book, user);
     EXPECT_EQ(user.searchAuthor("Author11"), true);
-    EXPECT_EQ(book.isAvailable(), false);
+    EXPECT_EQ(lib.getBook("Title11").isAvailable(), false);
 
     // Return the book using the client
     client.returnBook(book, user);
     EXPECT_EQ(user.searchAuthor("Author11"), false);
-    EXPECT_EQ(book.isAvailable(), true);
+    EXPECT_EQ(lib.getBook("Title11").isAvailable(), true);
 }
 
 TEST(LibraryTest, ReturnBookSameAuthor)

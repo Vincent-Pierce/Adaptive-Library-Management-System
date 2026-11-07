@@ -19,9 +19,8 @@ public:
 		const std::shared_ptr<Book> managedBook = lib.getBookPointer(book);
 		if (managedBook->isAvailable())
 		{
+			managedBook->borrow();
 			user.addBook(managedBook);
-			if (managedBook.get() != &book)
-				book.borrow();
 			lib.addUser(user);
 		}
 		else

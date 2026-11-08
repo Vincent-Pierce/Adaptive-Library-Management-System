@@ -1,8 +1,8 @@
 #ifndef USER_H
 #define USER_H
 
-#include "Searchable.h"
 #include "Book.h"
+#include "Searchable.h"
 #include "Transaction.h"
 #include <string> 
 #include <vector>
@@ -15,9 +15,10 @@ public:
 	User(std::string _name, int _userId, std::vector<std::weak_ptr<Book>> _borrowedBooks = {})
 		: name(_name), userId(_userId), borrowedBooks(std::move(_borrowedBooks)) {}
 
-	bool search(const std::string& query) override
+	bool search(const std::string& query) const override
 	{ 
-		return query == this->name;
+		return !query.empty() &&
+			(query == this->name || query == std::to_string(userId));
 	}
 	
 	bool searchAuthor(const std::string& query)  

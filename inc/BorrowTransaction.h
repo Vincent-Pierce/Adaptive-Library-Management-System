@@ -1,7 +1,6 @@
 #ifndef BORROW_TRANSACTION_H
 #define BORROW_TRANSACTION_H
 
-#include "Searchable.h"
 #include "Book.h"
 #include "User.h"
 #include "Transaction.h"
@@ -14,7 +13,9 @@ public:
 	BorrowTransaction(Library& _lib, Book& _book, User& _user)
 		: user(_user), book(_book), lib(_lib) {}
 
-	// Implementation of transaction for borrowing book. 
+	// Postcondition: on success, the book is unavailable and tracked by the user.
+	// Throws LibraryException (including BookException or InputException) when
+	// the book cannot be borrowed or is not in the library.
 	void transaction() override {
 		const std::shared_ptr<Book> managedBook = lib.getBookPointer(book);
 		if (managedBook->isAvailable())

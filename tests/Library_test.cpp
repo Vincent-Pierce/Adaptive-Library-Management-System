@@ -13,11 +13,27 @@ protected:
     }
 };
 
+class CustomSearch : public SearchStrategy {
+public:
+    bool search(const std::string& query) const override {
+        return query == "custom-query";
+    }
+};
+
 TEST(LibraryTest, SearchAddBook) {
     Library& lib = Library::Instance(); 
     Book book(false, "Author", "Title");
     lib.addBook(book);
-    EXPECT_EQ(lib.searchBook("Author"), true);
+    EXPECT_EQ(lib.search(BookSearchStrategy(lib.getBooks()), "Author"), true);
+}
+
+TEST(LibraryTest, SearchDelegatesToSearchStrategy) {
+    Library& lib = Library::Instance();
+    const CustomSearch searchStrategy;
+
+    EXPECT_TRUE(lib.search(searchStrategy, "custom-query"));
+    EXPECT_FALSE(lib.search(searchStrategy, "no-match"));
+    EXPECT_FALSE(lib.search(searchStrategy, ""));
 }
 
 TEST(LibraryTest, AddingDuplicateBooksIsRejected) {
@@ -37,7 +53,16 @@ TEST(LibraryTest, SearchAddUser) {
     Library& lib = Library::Instance(); 
     User user("John", 1, {});
     lib.addUser(user);
-    EXPECT_EQ(lib.searchUser("John"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "John"), true);
+}
+
+TEST(LibraryTest, SearchUserByUserId) {
+    Library& lib = Library::Instance();
+    const User user("Student", 42, {});
+    lib.addUser(user);
+
+    EXPECT_TRUE(lib.search(UserSearchStrategy(lib.getUsers()), "42"));
+    EXPECT_FALSE(lib.search(UserSearchStrategy(lib.getUsers()), "43"));
 }
 
 TEST(LibraryTest, RemoveUser) {
@@ -45,7 +70,7 @@ TEST(LibraryTest, RemoveUser) {
     User user("Jane", 2, {});
     lib.addUser(user);
     EXPECT_EQ(lib.removeUser(user), true);
-    EXPECT_EQ(lib.searchUser("Jane"), false);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "Jane"), false);
 }
 
 TEST(LibraryTest, RemoveNonExistentUser) {
@@ -56,12 +81,12 @@ TEST(LibraryTest, RemoveNonExistentUser) {
 
 TEST(LibraryTest, SearchNonExistentBook) {
     Library& lib = Library::Instance(); 
-    EXPECT_EQ(lib.searchBook("NonExistent"), false);
+    EXPECT_EQ(lib.search(BookSearchStrategy(lib.getBooks()), "NonExistent"), false);
 }
 
 TEST(LibraryTest, SearchNonExistentUser) {
     Library& lib = Library::Instance(); 
-    EXPECT_EQ(lib.searchUser("NonExistent"), false);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "NonExistent"), false);
 }
 
 TEST(LibraryTest, BorrowBook) {
@@ -77,7 +102,7 @@ TEST(LibraryTest, BorrowBook) {
     BorrowTransaction bt1(lib, book1, user1);
     user1.transaction(&bt1);
     EXPECT_EQ(user1.searchAuthor("Author1"), true);
-    EXPECT_EQ(lib.searchUser("User1"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User1"), true);
 }
 
 TEST(LibraryTest, BorrowUnavailableBook) {
@@ -91,10 +116,17 @@ TEST(LibraryTest, BorrowUnavailableBook) {
     EXPECT_THROW(user.transaction(&bt), BookException);
 }
 
-TEST(LibraryTest, InputExceptionOnEmptySearch) {
+TEST(LibraryTest, EmptySearchReturnsFalse) {
     Library& lib = Library::Instance(); 
-    EXPECT_THROW(lib.searchBook(""), InputException);
-    EXPECT_THROW(lib.searchUser(""), InputException);
+    lib.addBook(Book(true, "", ""));
+    const std::vector<User> users{User("", 0)};
+    const BookSearchStrategy bookSearch(lib.getBooks());
+    const UserSearchStrategy userSearch(users);
+
+    EXPECT_FALSE(lib.search(bookSearch, ""));
+    EXPECT_FALSE(lib.search(userSearch, ""));
+    EXPECT_FALSE(bookSearch.search(""));
+    EXPECT_FALSE(userSearch.search(""));
 }
 
 TEST(LibraryTest, ReturnBook) {
@@ -107,13 +139,13 @@ TEST(LibraryTest, ReturnBook) {
     BorrowTransaction bt(lib, book, user);
     user.transaction(&bt);
     EXPECT_EQ(user.searchAuthor("Author4"), true);
-    EXPECT_EQ(lib.searchUser("User4"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User4"), true);
     EXPECT_EQ(lib.getBook("Title4").isAvailable(), false);
 
     ReturnTransaction rt(lib, book, user);
     user.transaction(&rt);
     EXPECT_EQ(user.searchAuthor("Author4"), false);
-    EXPECT_EQ(lib.searchUser("User4"), false);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User4"), false);
     EXPECT_EQ(lib.getBook("Title4").isAvailable(), true);
 }
 
@@ -190,7 +222,7 @@ TEST(LibraryTest, RemoveUserAfterReturningAllBooks) {
     user.transaction(&rt2);
     
     EXPECT_EQ(user.getBookCount(), 0);
-    EXPECT_EQ(lib.searchUser("User7"), false); 
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User7"), false);
 }
 
 TEST(LibraryTest, FileManagerSaveLoad) {
@@ -209,10 +241,10 @@ TEST(LibraryTest, FileManagerSaveLoad) {
     lib.clear();
     FileManager::loadLibrary();
 
-    EXPECT_EQ(lib.searchBook("Author9"), true);
-    EXPECT_EQ(lib.searchBook("Author10"), true);
-    EXPECT_EQ(lib.searchUser("User8"), true);
-    EXPECT_EQ(lib.searchUser("User9"), true);
+    EXPECT_EQ(lib.search(BookSearchStrategy(lib.getBooks()), "Author9"), true);
+    EXPECT_EQ(lib.search(BookSearchStrategy(lib.getBooks()), "Author10"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User8"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User9"), true);
 }
 
 TEST(LibraryTest, ClientBorrowReturn)
@@ -254,10 +286,10 @@ TEST(LibraryTest, ReturnBookSameAuthor)
     ReturnTransaction rt1(lib, book1, user);
     user.transaction(&rt1);
     EXPECT_EQ(user.getBookCount(), 1);
-    EXPECT_EQ(lib.searchUser("User11"), true);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User11"), true);
 
     ReturnTransaction rt2(lib, book2, user);
     user.transaction(&rt2);
     EXPECT_EQ(user.getBookCount(), 0);
-    EXPECT_EQ(lib.searchUser("User11"), false);
+    EXPECT_EQ(lib.search(UserSearchStrategy(lib.getUsers()), "User11"), false);
 }

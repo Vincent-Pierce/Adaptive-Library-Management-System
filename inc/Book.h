@@ -1,8 +1,8 @@
 #ifndef BOOK_H
 #define BOOK_H
 
-#include "Searchable.h"
 #include  <string> 
+#include "Searchable.h"
 #include <BookException.h>
 class Book : public Searchable {
 public:
@@ -35,9 +35,9 @@ public:
 	}
 	
 	// Return if the query matches author or title 
-	bool search(const std::string& query) override 
+	bool search(const std::string& query) const override
 	{ 
-		return query == author || query == title;
+		return !query.empty() && (query == author || query == title);
 	} 
 
 	bool isAvailable() const{ return this->available; }

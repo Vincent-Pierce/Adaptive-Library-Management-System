@@ -1,136 +1,137 @@
 @startuml
 
 class Library {
-    - books : vector<Book>
+    - books : vector<shared_ptr<Book>>
     - users : vector<User>
-
-    + Instance()
-    + searchUser(query : string)
-    + searchBook(query : string)
-    + getBook(query : string)
-    + getUser(query : string)
-    + addUser(u : user)
-    + removeUser(u : User)
-    + clear()
-    + getBooks()
-    + getUsers()
-    + addBook()
     - Library()
+    + Instance() : Library&
+    + search(strategy : const SearchStrategy&, query : const string&) : bool
+    + getBook(query : string) : Book&
+    + getBookPointer(book : Book&) : shared_ptr<Book>
+    + getUser(query : string) : User&
+    + addUser(user : User) : void
+    + removeUser(user : User&) : bool
+    + clear() : void
+    + getBooks() : const vector<shared_ptr<Book>>&
+    + getUsers() : const vector<User>&
+    + addBook(book : Book) : bool
 }
 
 interface Searchable {
+    + search(query : string) : bool
+}
 
-    +search(query : string)
+interface SearchStrategy {
+    + search(query : string) : bool
+}
+
+class BookSearchStrategy {
+    - books : const vector<shared_ptr<Book>>&
+    + BookSearchStrategy(books : const vector<shared_ptr<Book>>&)
+    + search(query : string) : bool
+}
+
+class UserSearchStrategy {
+    - users : const vector<User>&
+    + UserSearchStrategy(users : const vector<User>&)
+    + search(query : string) : bool
 }
 
 class Book {
-    - available : bool 
-    - author : String
-    - title : String
-
-    + borrow()
-    + returnBook()
-    + search(query : string)
-    + isAvailable()
-    + getAuthor()
-    + getTitle()
+    - available : bool
+    - author : string
+    - title : string
+    + Book(available : bool, author : string, title : string)
+    + borrow() : void
+    + returnBook() : void
+    + search(query : string) : bool
+    + isAvailable() : bool
+    + getAuthor() : const string
+    + getTitle() : const string
 }
 
 class User {
-    - name : String
+    - name : string
     - userId : int
-    - book_authors : vector<String>
-
-    + search(query : string)
-    + searchAuthor(query : string)
-    + addBook(b : Book)
-    + returnBook(b : Book)
-    + getBookAuthors()
-    + getBookCount()
-    + getUserName()
-    + getUserId()
-    + transaction(t : Transaction)
+    - borrowedBooks : vector<weak_ptr<Book>>
+    + User(name : string, userId : int, borrowedBooks : vector<weak_ptr<Book>>)
+    + search(query : string) : bool
+    + searchAuthor(query : string) : bool
+    + addBook(book : shared_ptr<Book>) : bool
+    + trackBorrowedBook(book : shared_ptr<Book>) : void
+    + returnBook(book : shared_ptr<Book>) : bool
+    + getBookAuthors() : vector<string>
+    + getBookCount() : int
+    + getUserName() : string
+    + getUserId() : int
+    + transaction(transaction : Transaction*) : void
 }
-
-/'
-The command design pattern is implemented for the Transaction interface
-User invokes Transactions and Library received the command .
-'/
 
 class Client {
     - lib : Library&
-    + borrowBook(u : User, b : Book)
-    + returnBook(u : User, b : Book)
+    + Client(lib : Library&)
+    + borrowBook(book : Book&, user : User&) : bool
+    + returnBook(book : Book&, user : User&) : bool
 }
 
 interface Transaction {
-
-    +transaction()
+    + transaction() : void
 }
 
-/' 
-Add the book to the list of books contained by user. Also move book from available list to borrowed list in library 
-'/
 class BorrowTransaction {
-    - user : User&
-    - book : Book&
     - lib : Library&
-    
-    +transaction()
+    - book : Book&
+    - user : User&
+    + BorrowTransaction(lib : Library&, book : Book&, user : User&)
+    + transaction() : void
 }
 
-/'
-Remove the book from list of books contained by user. Also move book from borrowed list in library to available list in library
-'/
 class ReturnTransaction {
-    - user : User&
-    - book : Book&
     - lib : Library&
-
-    +transaction()
-}
-
-class LibraryException {
-    - message : String
-
-    + what()
-}
-
-class BookException {
-
-}
-
-class InputException {
-
+    - book : Book&
+    - user : User&
+    + ReturnTransaction(lib : Library&, book : Book&, user : User&)
+    + transaction() : void
 }
 
 class FileManager {
-    + saveLibrary()
-    + loadLibrary()
+    + saveLibrary() : void
+    + loadLibrary() : void
 }
 
-class LibraryException <<exception>>
-class InputException <<exception>>
+class LibraryException <<exception>> {
+    - message : string
+    + what() : const char*
+}
+
 class BookException <<exception>>
+class InputException <<exception>>
 
 Searchable <|.. Book
 Searchable <|.. User
+SearchStrategy <|.. BookSearchStrategy
+SearchStrategy <|.. UserSearchStrategy
 Transaction <|.. BorrowTransaction
 Transaction <|.. ReturnTransaction
-Transaction --> Library : Receiver
-Client --> BorrowTransaction : Create
-Client --> ReturnTransaction : Create
-Client --> Library : Uses
+
 Library "1" o-- "*" Book
 Library "1" o-- "*" User
-Library --> Searchable
-User --> Book : borrows
-User --> Transaction : Invokes
-FileManager --> Library : save / load 
+Library ..> SearchStrategy : uses strategy
+BookSearchStrategy ..> Book : searches
+UserSearchStrategy ..> User : searches
+User "1" o-- "*" Book : borrowedBooks (weak references)
+User ..> Transaction : invokes
+Client --> Library : uses
+Client ..> BorrowTransaction : creates
+Client ..> ReturnTransaction : creates
+BorrowTransaction --> Library : receiver
+ReturnTransaction --> Library : receiver
+FileManager ..> Library : saves / loads
+
 BookException --|> LibraryException
 InputException --|> LibraryException
-Client ..|> InputException : <<Throws>>
-ReturnTransaction ..|> BookException : <<Throws>>
-BorrowTransaction ..|> BookException : <<Throws>>
-Library ..|> InputException : <<Throws>>
+Library ..> InputException : throws
+Book ..> BookException : throws
+BorrowTransaction ..> BookException : throws
+ReturnTransaction ..> BookException : throws
 @enduml

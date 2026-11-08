@@ -3,7 +3,7 @@
 
 #include "Book.h"
 #include "User.h"
-#include "Searchable.h"
+#include "SearchStrategies.h"
 #include  <string> 
 #include <memory>
 #include <vector>
@@ -19,31 +19,12 @@ public:
 		return instance;
 	}
 
-	// search for user by name
-	bool searchUser(const std::string query)  
-	{ 
+	bool search(const SearchStrategy& strategy, const std::string& query) const
+	{
 		if(query.empty())
-			throw InputException("Search query cannot be empty.");
-		for(User& u : users)
-		{
-			if(u.search(query))
-				return true;
-		}
-		return false;
+			return false;
+		return strategy.search(query);
 	}
-
-	// search for book by author or title
-	bool searchBook(const std::string query)  
-	{ 
-		if(query.empty())
-			throw InputException("Search query cannot be empty.");
-		for(const std::shared_ptr<Book>& b : books)
-		{
-			if(b->search(query))
-				return true;
-		}
-		return false;
-	} 
 
 	Book& getBook(const std::string query)  
 	{ 
@@ -79,7 +60,8 @@ public:
 
 	void addUser(const User& u)
 	{ 
-		if(!searchUser(u.getUserName()))
+		const UserSearchStrategy userSearch(users);
+		if(!search(userSearch, u.getUserName()))
 			users.push_back(u);
 	}
 
